@@ -10,6 +10,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "KismetTraceUtils.h"
+#include "GameFramework/PlayerState.h"
+#include "Kismet/KismetMathLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -25,7 +28,7 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-
+	
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
@@ -52,6 +55,9 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	objectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	actorsToIgnore.Add(this);
 }
 
 void AThirdPersonCharacter::BeginPlay()
@@ -72,6 +78,9 @@ void AThirdPersonCharacter::BeginPlay()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
+
+
+
 void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -86,6 +95,9 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Look);
+
+		// Pushing
+		EnhancedInputComponent->BindAction(PushAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Push);
 	}
 	else
 	{
@@ -126,5 +138,51 @@ void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AThirdPersonCharacter::Push()
+{
+	if (GetCharacterMovement()->IsFalling())
+		return;
+
+	PushServer();
+}
+
+void AThirdPersonCharacter::PushServer_Implementation()
+{
+	PushMulticast();
+}
+
+void AThirdPersonCharacter::PushMulticast_Implementation()
+{
+	if (bIsPunching)
+		return;
+
+	bIsPunching = true;
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::TriggerPush, .8f, false);
+}
+
+void AThirdPersonCharacter::TriggerPush()
+{
+	FVector location = GetMesh()->GetComponentLocation();
+	FVector rotation = UKismetMathLibrary::GetRightVector(GetMesh()->GetComponentRotation());
+
+	FHitResult hit;
+	bool bCollideObject = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), location, location + (rotation * 100), 30.f, objectTypesArray, false, actorsToIgnore, EDrawDebugTrace::ForDuration, hit, true);
+
+	bIsPunching = false;
+    UE_LOG(LogTemp, Warning, TEXT("hit is %s"), (bCollideObject ? TEXT("true") : TEXT("false")));
+	if(bCollideObject)
+	{
+        if(auto otherActor = Cast<AThirdPersonCharacter>(hit.GetActor()))
+	    {
+			UE_LOG(LogTemp, Warning, TEXT("other actor %s"), *otherActor->GetPlayerState()->GetPlayerName());
+			otherActor->LaunchCharacter(rotation * 400, false, false);
+	    }
+		else
+			UE_LOG(LogTemp, Warning, TEXT("The Actor's name is null"));
 	}
 }

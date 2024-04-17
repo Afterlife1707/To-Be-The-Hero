@@ -44,8 +44,15 @@ class AThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Push Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* PushAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	bool bIsPunching;
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
+	TArray<TObjectPtr<AActor>> actorsToIgnore;
 
 public:
 	AThirdPersonCharacter();
@@ -58,7 +65,16 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
+	
+	void Push();
+
+	UFUNCTION(Server, Reliable)
+	void PushServer();
+
+	UFUNCTION(NetMulticast, reliable)
+	void PushMulticast();
+
+	void TriggerPush();
 
 protected:
 	// APawn interface
