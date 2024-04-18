@@ -3,6 +3,7 @@
 
 #include "BaseItem.h"
 
+#include "ThirdPersonCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -21,13 +22,16 @@ ABaseItem::ABaseItem()
 	SkeletalMesh->SetupAttachment(RootComponent);
 	bReplicates = true;
 }
+
+
+
 // Called when the game starts or when spawned
 void ABaseItem::BeginPlay()
 {
 	Super::BeginPlay();
+	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &ABaseItem::ItemOverlapped);
 	if (!HasAuthority())
 		return;
-
 	if(bIsBaseItem)
 	{
 		if (UKismetMathLibrary::RandomBool())
@@ -51,3 +55,23 @@ void ABaseItem::Tick(float DeltaTime)
 
 }
 
+void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(auto* Character = Cast<AThirdPersonCharacter>(OtherActor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Component hit"));
+		if (bIsEquippable)
+		{
+			SetActorEnableCollision(false);
+			if (StaticMesh->GetStaticMesh())
+				StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "head");
+		}
+		else
+		{
+			//UPDATE MANA
+			Destroy();
+		}
+	}
+}

@@ -32,7 +32,14 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ItemType")
 	TArray<TSubclassOf<ABaseItem>> AllChildClasses;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ItemType")
+	bool bIsEquippable = true;
+
 protected:
+	UFUNCTION()
+	void ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

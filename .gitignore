@@ -74,3 +74,8 @@ Plugins
 
 # Cache files for the editor to use
 DerivedDataCache/*
+Content/Primitive_Characters_Pack/Textures/Primitive_01/Primitive_Character_Set_01/T_Primitive_Character_Set_01_Normals.uasset
+Content/Primitive_Characters_Pack/Textures/Primitive_01/Primitive_Character_Set_02/T_Primitive_Character_Set_02_Normals.uasset
+Content/Primitive_Characters_Pack/Textures/Primitive_02/Character/T_Primitive_02_Normals.uasset
+Content/Primitive_Characters_Pack/Textures/Primitive_03/Character/T_Primitive_03_Normals.uasset
+Content/Primitive_Characters_Pack/Textures/Primitive_04/Character/T_Primitive_04_Normals.uasset
