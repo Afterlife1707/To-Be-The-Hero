@@ -13,6 +13,16 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
+
+UENUM(BlueprintType)
+enum ECharacterClass
+{
+	Knight,
+	Wizard,
+	Farmer,
+	Default
+};
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
@@ -48,15 +58,25 @@ class AThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* PushAction;
 
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	TEnumAsByte<ECharacterClass> CharacterType = ECharacterClass::Default;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	bool bIsPunching;
+
+
+	UFUNCTION(BlueprintGetter)
+	TEnumAsByte<ECharacterClass> GetCharacterType() const { return CharacterType; }
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
 	TArray<TObjectPtr<AActor>> actorsToIgnore;
 
 public:
 	AThirdPersonCharacter();
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	bool bHasItem;
 
 protected:
 

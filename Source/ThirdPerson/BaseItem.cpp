@@ -58,15 +58,16 @@ void ABaseItem::Tick(float DeltaTime)
 void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(auto* Character = Cast<AThirdPersonCharacter>(OtherActor))
+	if(auto* Character = Cast<AThirdPersonCharacter>(OtherActor) && !Character->bHasItem)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Component hit"));
+		Character->bHasItem = true;
 		if (bIsEquippable)
 		{
 			SetActorEnableCollision(false);
 			if (StaticMesh->GetStaticMesh())
 				StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "head");
+			AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
 		}
 		else
 		{

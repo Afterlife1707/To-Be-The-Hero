@@ -12,7 +12,7 @@ enum EItemType
     Weapon,
 	Mana,
 	Throwable,
-	Others
+	None
 };
 
 UCLASS()
@@ -28,13 +28,16 @@ public:
 	bool bIsBaseItem = true;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ItemType")
-	TEnumAsByte<EItemType> ItemType = EItemType::Others;
+	TEnumAsByte<EItemType> ItemType = EItemType::None;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ItemType")
 	TArray<TSubclassOf<ABaseItem>> AllChildClasses;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ItemType")
 	bool bIsEquippable = true;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ItemType")
+	FName socketName = "weapon_socket";
 
 protected:
 	UFUNCTION()
