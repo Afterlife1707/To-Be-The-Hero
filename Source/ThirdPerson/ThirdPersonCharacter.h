@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseItem.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "ThirdPersonCharacter.generated.h"
@@ -54,16 +55,16 @@ class AThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	/** Push Input Action */
+	/** Attack Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* PushAction;
+	UInputAction* AttackAction;
 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<ECharacterClass> CharacterType = ECharacterClass::Default;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	bool bIsPunching;
+	bool bIsAttacking;
 
 
 	UFUNCTION(BlueprintGetter)
@@ -76,8 +77,9 @@ public:
 	AThirdPersonCharacter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
-	bool bHasItem;
-
+	TEnumAsByte<EItemType> CurrentItem = EItemType::None;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	TObjectPtr<AActor> Throwable;
 protected:
 
 	/** Called for movement input */
@@ -86,15 +88,18 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 	
-	void Push();
+	void Attack();
 
 	UFUNCTION(Server, Reliable)
-	void PushServer();
+	void AttackServer();
 
 	UFUNCTION(NetMulticast, reliable)
-	void PushMulticast();
+	void AttackMulticast();
 
-	void TriggerPush();
+	void TriggerAttack();
+	void Melee();
+	void CastSpell();
+	void Throw();
 
 protected:
 	// APawn interface

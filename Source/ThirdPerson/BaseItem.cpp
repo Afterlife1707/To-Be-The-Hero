@@ -15,11 +15,9 @@ ABaseItem::ABaseItem()
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 
 	RootComponent = BoxCollision;
 	StaticMesh->SetupAttachment(RootComponent);
-	SkeletalMesh->SetupAttachment(RootComponent);
 	bReplicates = true;
 }
 
@@ -38,7 +36,6 @@ void ABaseItem::BeginPlay()
 		{
 			int32 rand = UKismetMathLibrary::RandomIntegerInRange(0, AllChildClasses.Num() - 1);
 			const TSubclassOf<ABaseItem> RandomClassItemToSpawn = AllChildClasses[rand];
-			UE_LOG(LogTemp, Warning, TEXT("Random val %d"), rand);
             if(ABaseItem* ItemRef = GetWorld()->SpawnActor<ABaseItem>(RandomClassItemToSpawn, GetActorTransform()))
 				ItemRef->bIsBaseItem = false;
 			Destroy();
@@ -58,16 +55,22 @@ void ABaseItem::Tick(float DeltaTime)
 void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(auto* Character = Cast<AThirdPersonCharacter>(OtherActor) && !Character->bHasItem)
+    if(AThirdPersonCharacter* Character = Cast<AThirdPersonCharacter>(OtherActor); Character && Character->CurrentItem== EItemType::None)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Component hit"));
-		Character->bHasItem = true;
 		if (bIsEquippable)
 		{
+			if (ItemType == EItemType::Weapon)
+				Character->CurrentItem = EItemType::Weapon;
+			else if (ItemType == EItemType::Throwable)
+			{
+				Character->CurrentItem = EItemType::Throwable;
+				Character->Throwable = this;
+			}
 			SetActorEnableCollision(false);
 			if (StaticMesh->GetStaticMesh())
 				StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, socketName);
+			AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
 		}
 		else
 		{

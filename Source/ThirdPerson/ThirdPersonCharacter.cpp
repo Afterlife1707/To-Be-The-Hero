@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "KismetTraceUtils.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -78,9 +79,6 @@ void AThirdPersonCharacter::BeginPlay()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-
-
-
 void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -97,7 +95,7 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Look);
 
 		// Pushing
-		EnhancedInputComponent->BindAction(PushAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Push);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Attack);
 	}
 	else
 	{
@@ -110,7 +108,7 @@ void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr && !bIsPunching)
+	if (Controller != nullptr && !bIsAttacking)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -141,48 +139,111 @@ void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void AThirdPersonCharacter::Push()
+void AThirdPersonCharacter::Attack()
 {
 	if (GetCharacterMovement()->IsFalling())
 		return;
 
-	PushServer();
+	AttackServer();
 }
 
-void AThirdPersonCharacter::PushServer_Implementation()
+void AThirdPersonCharacter::AttackServer_Implementation()
 {
-	PushMulticast();
+	AttackMulticast();
 }
 
-void AThirdPersonCharacter::PushMulticast_Implementation()
+void AThirdPersonCharacter::AttackMulticast_Implementation()
 {
-	if (bIsPunching)
+	if (bIsAttacking)
 		return;
 
-	bIsPunching = true;
+	bIsAttacking = true;
 
 	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::TriggerPush, .8f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::TriggerAttack, .8f, false);
 }
 
-void AThirdPersonCharacter::TriggerPush()
+void AThirdPersonCharacter::TriggerAttack()
 {
+	switch(CurrentItem)
+	{
+	    case EItemType::None:
+	    {
+			Melee();
+			break;
+	    }
+	    case EItemType::Weapon://and class check knight here, play sword sound on hit
+		{
+			Melee();
+			break;
+		}
+	    case EItemType::Throwable://and class check farmer here
+		{
+			Throw();
+			break;
+		}
+	    case EItemType::Mana: //and class check wizard here
+		{
+			CastSpell();
+			break;
+		}
+	    default:
+		{
+			Melee();
+			break;
+		}
+	}
+
+	bIsAttacking = false;
+}
+
+void AThirdPersonCharacter::Melee()
+{
+	UE_LOG(LogTemp, Warning, TEXT("melee"));
 	FVector location = GetMesh()->GetComponentLocation();
 	FVector rotation = UKismetMathLibrary::GetRightVector(GetMesh()->GetComponentRotation());
 
 	FHitResult hit;
-	bool bCollideObject = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), location, location + (rotation * 100), 30.f, objectTypesArray, false, actorsToIgnore, EDrawDebugTrace::ForDuration, hit, true);
+	bool bCollideObject = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), location, location + (rotation * 100), 30.f, objectTypesArray, false, actorsToIgnore, EDrawDebugTrace::None, hit, true);
 
-	bIsPunching = false;
-    UE_LOG(LogTemp, Warning, TEXT("hit is %s"), (bCollideObject ? TEXT("true") : TEXT("false")));
-	if(bCollideObject)
+	UE_LOG(LogTemp, Warning, TEXT("hit is %s"), (bCollideObject ? TEXT("true") : TEXT("false")));
+	if (bCollideObject)
 	{
-        if(auto otherActor = Cast<AThirdPersonCharacter>(hit.GetActor()))
-	    {
+		if (auto otherActor = Cast<AThirdPersonCharacter>(hit.GetActor()))
+		{
 			UE_LOG(LogTemp, Warning, TEXT("other actor %s"), *otherActor->GetPlayerState()->GetPlayerName());
 			otherActor->LaunchCharacter(rotation * 400, false, false);
-	    }
+		}
 		else
 			UE_LOG(LogTemp, Warning, TEXT("The Actor's name is null"));
 	}
 }
+
+void AThirdPersonCharacter::CastSpell()
+{
+	//TODO
+	UE_LOG(LogTemp, Warning, TEXT("spell cast"));
+}
+
+void AThirdPersonCharacter::Throw()
+{
+	UE_LOG(LogTemp, Warning, TEXT("throw object"));
+	if (Throwable)
+	{
+		Throwable->SetActorEnableCollision(true);
+		//Throwable->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		if (auto boxComp = Cast<UBoxComponent>(Throwable->GetRootComponent()))
+		{
+			const FVector PlayerLocation = GetActorLocation();
+			boxComp->SetSimulatePhysics(true);
+			boxComp->SetCollisionProfileName("BlockAll");
+			boxComp->SetPhysicsLinearVelocity((Throwable->GetActorLocation()-PlayerLocation).GetSafeNormal() * 1000.f);
+		}
+		AActor* ThrowableActor = Throwable;
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, [ThrowableActor]() { ThrowableActor->Destroy(); }, 5.f, false);
+	}
+	CurrentItem = EItemType::None; // empty after throw
+	Throwable = nullptr;
+}
+
