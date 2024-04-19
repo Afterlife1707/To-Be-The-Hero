@@ -94,8 +94,11 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Look);
 
-		// Pushing
+		// Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Attack);
+
+		// Throw
+		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Throw);
 	}
 	else
 	{
@@ -139,11 +142,19 @@ void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+#pragma region ATTACK
 void AThirdPersonCharacter::Attack()
 {
 	if (GetCharacterMovement()->IsFalling())
 		return;
-
+	if (CharacterType == ECharacterClass::Farmer)
+	{
+	    if (CurrentItem == EItemType::Weapon || CurrentItem == EItemType::Throwable)
+		    return;
+	}
+	if (CharacterType == ECharacterClass::Knight && CurrentItem == EItemType::Throwable)
+		return;
+	//TODO Cannot attack notify user with UI in above cases
 	AttackServer();
 }
 
@@ -165,6 +176,9 @@ void AThirdPersonCharacter::AttackMulticast_Implementation()
 
 void AThirdPersonCharacter::TriggerAttack()
 {
+	//knight can attack and throw
+	//peasant can only throw(both sword and throwable)
+	//wizard can only pickup mana
 	switch(CurrentItem)
 	{
 	    case EItemType::None:
@@ -177,12 +191,12 @@ void AThirdPersonCharacter::TriggerAttack()
 			Melee();
 			break;
 		}
-	    case EItemType::Throwable://and class check farmer here
+	    case EItemType::Throwable:
 		{
 			Throw();
 			break;
 		}
-	    case EItemType::Mana: //and class check wizard here
+	    case EItemType::Mana:
 		{
 			CastSpell();
 			break;
@@ -197,6 +211,7 @@ void AThirdPersonCharacter::TriggerAttack()
 	bIsAttacking = false;
 }
 
+
 void AThirdPersonCharacter::Melee()
 {
 	UE_LOG(LogTemp, Warning, TEXT("melee"));
@@ -204,7 +219,7 @@ void AThirdPersonCharacter::Melee()
 	FVector rotation = UKismetMathLibrary::GetRightVector(GetMesh()->GetComponentRotation());
 
 	FHitResult hit;
-	bool bCollideObject = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), location, location + (rotation * 100), 30.f, objectTypesArray, false, actorsToIgnore, EDrawDebugTrace::None, hit, true);
+	bool bCollideObject = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), location, location + (rotation * 100), 20.f, objectTypesArray, false, actorsToIgnore, EDrawDebugTrace::None, hit, true);
 
 	UE_LOG(LogTemp, Warning, TEXT("hit is %s"), (bCollideObject ? TEXT("true") : TEXT("false")));
 	if (bCollideObject)
@@ -214,10 +229,9 @@ void AThirdPersonCharacter::Melee()
 			UE_LOG(LogTemp, Warning, TEXT("other actor %s"), *otherActor->GetPlayerState()->GetPlayerName());
 			otherActor->LaunchCharacter(rotation * 400, false, false);
 		}
-		else
-			UE_LOG(LogTemp, Warning, TEXT("The Actor's name is null"));
 	}
 }
+#pragma endregion
 
 void AThirdPersonCharacter::CastSpell()
 {
@@ -225,25 +239,65 @@ void AThirdPersonCharacter::CastSpell()
 	UE_LOG(LogTemp, Warning, TEXT("spell cast"));
 }
 
+#pragma region THROW
 void AThirdPersonCharacter::Throw()
+{
+	if (GetCharacterMovement()->IsFalling() || CharacterType == ECharacterClass::Wizard || CurrentItem == EItemType::None)
+		return;
+
+	ThrowServer();
+}
+
+void AThirdPersonCharacter::ThrowServer_Implementation()
+{
+	ThrowMulticast();
+}
+
+void AThirdPersonCharacter::ThrowMulticast_Implementation()
+{
+	if (bIsAttacking)
+		return;
+
+	bIsAttacking = true;
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::TriggerThrow, .8f, false);
+}
+
+
+void AThirdPersonCharacter::TriggerThrow()
 {
 	UE_LOG(LogTemp, Warning, TEXT("throw object"));
 	if (Throwable)
 	{
 		Throwable->SetActorEnableCollision(true);
 		//Throwable->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-		if (auto boxComp = Cast<UBoxComponent>(Throwable->GetRootComponent()))
+        UBoxComponent* boxComp = Cast<UBoxComponent>(Throwable->GetRootComponent());
+		if (boxComp)
 		{
-			const FVector PlayerLocation = GetActorLocation();
+			const FVector PlayerLocation = GetActorForwardVector();
 			boxComp->SetSimulatePhysics(true);
 			boxComp->SetCollisionProfileName("BlockAll");
-			boxComp->SetPhysicsLinearVelocity((Throwable->GetActorLocation()-PlayerLocation).GetSafeNormal() * 1000.f);
+			boxComp->SetPhysicsLinearVelocity(PlayerLocation.GetSafeNormal() * 1000.f);
 		}
 		AActor* ThrowableActor = Throwable;
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle, [ThrowableActor]() { ThrowableActor->Destroy(); }, 5.f, false);
+		//destroying both sword and throwable for now since it will cause issues with hitting player with sword
+		//if(CurrentItem==EItemType::Throwable) //destroy if throwable thrown
+		//{
+			FTimerHandle TimerHandle;
+			GetWorldTimerManager().SetTimer(TimerHandle, [ThrowableActor]() { ThrowableActor->Destroy(); }, 5.f, false);
+		//}
+		//else //else renable overlap collision detection
+		//{
+		//	FTimerHandle TimerHandle;
+		//	GetWorldTimerManager().SetTimer(TimerHandle, [boxComp]() {boxComp->SetCollisionProfileName("OverlapOnlyPawn"); }, 5.f, false);
+		//}
+
 	}
+
+	bIsAttacking = false;
 	CurrentItem = EItemType::None; // empty after throw
 	Throwable = nullptr;
 }
 
+#pragma endregion

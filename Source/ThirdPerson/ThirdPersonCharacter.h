@@ -59,6 +59,9 @@ class AThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* AttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ThrowAction;
+
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<ECharacterClass> CharacterType = ECharacterClass::Default;
@@ -67,14 +70,14 @@ class AThirdPersonCharacter : public ACharacter
 	bool bIsAttacking;
 
 
-	UFUNCTION(BlueprintGetter)
-	TEnumAsByte<ECharacterClass> GetCharacterType() const { return CharacterType; }
-
 	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
 	TArray<TObjectPtr<AActor>> actorsToIgnore;
 
 public:
 	AThirdPersonCharacter();
+
+	UFUNCTION(BlueprintGetter)
+	TEnumAsByte<ECharacterClass> GetCharacterType() const { return CharacterType; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TEnumAsByte<EItemType> CurrentItem = EItemType::None;
@@ -89,17 +92,20 @@ protected:
 	void Look(const FInputActionValue& Value);
 	
 	void Attack();
-
 	UFUNCTION(Server, Reliable)
 	void AttackServer();
-
 	UFUNCTION(NetMulticast, reliable)
 	void AttackMulticast();
-
 	void TriggerAttack();
+
+	void Throw();
+	UFUNCTION(Server, Reliable)
+	void ThrowServer();
+	UFUNCTION(NetMulticast, reliable)
+	void ThrowMulticast();
+	void TriggerThrow();
 	void Melee();
 	void CastSpell();
-	void Throw();
 
 protected:
 	// APawn interface

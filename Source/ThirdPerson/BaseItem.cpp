@@ -32,16 +32,16 @@ void ABaseItem::BeginPlay()
 		return;
 	if(bIsBaseItem)
 	{
-		if (UKismetMathLibrary::RandomBool())
-		{
+		//if (UKismetMathLibrary::RandomBool())
+		//{
 			int32 rand = UKismetMathLibrary::RandomIntegerInRange(0, AllChildClasses.Num() - 1);
 			const TSubclassOf<ABaseItem> RandomClassItemToSpawn = AllChildClasses[rand];
             if(ABaseItem* ItemRef = GetWorld()->SpawnActor<ABaseItem>(RandomClassItemToSpawn, GetActorTransform()))
 				ItemRef->bIsBaseItem = false;
 			Destroy();
-		}
-		else
-			Destroy();
+		//}
+		//else
+			//Destroy();
 	}
 }
 
@@ -63,10 +63,8 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 			if (ItemType == EItemType::Weapon)
 				Character->CurrentItem = EItemType::Weapon;
 			else if (ItemType == EItemType::Throwable)
-			{
 				Character->CurrentItem = EItemType::Throwable;
-				Character->Throwable = this;
-			}
+			Character->Throwable = this;
 			SetActorEnableCollision(false);
 			if (StaticMesh->GetStaticMesh())
 				StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -75,7 +73,8 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 		else
 		{
 			//UPDATE MANA
-			Destroy();
+			if(Character->GetCharacterType() == ECharacterClass::Wizard)
+			    Destroy();
 		}
 	}
 }
