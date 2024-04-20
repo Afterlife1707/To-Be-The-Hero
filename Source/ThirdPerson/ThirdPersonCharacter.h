@@ -105,6 +105,7 @@ protected:
 	void ThrowMulticast();
 	void TriggerThrow();
 	void Melee();
+	UFUNCTION(BlueprintImplementableEvent, Category=Combat, meta = (AllowPrivateAccess = "true"))
 	void CastSpell();
 
 protected:

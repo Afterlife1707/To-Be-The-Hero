@@ -97,7 +97,7 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		// Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Attack);
 
-		// Throw
+		// Throw //cast spell for wizard
 		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Throw);
 	}
 	else
@@ -176,9 +176,7 @@ void AThirdPersonCharacter::AttackMulticast_Implementation()
 
 void AThirdPersonCharacter::TriggerAttack()
 {
-	//knight can attack and throw
-	//peasant can only throw(both sword and throwable)
-	//wizard can only pickup mana
+	//wizard can only melee in this case
 	switch(CurrentItem)
 	{
 	    case EItemType::None:
@@ -194,11 +192,6 @@ void AThirdPersonCharacter::TriggerAttack()
 	    case EItemType::Throwable:
 		{
 			Throw();
-			break;
-		}
-	    case EItemType::Mana:
-		{
-			CastSpell();
 			break;
 		}
 	    default:
@@ -233,16 +226,16 @@ void AThirdPersonCharacter::Melee()
 }
 #pragma endregion
 
-void AThirdPersonCharacter::CastSpell()
-{
-	//TODO
-	UE_LOG(LogTemp, Warning, TEXT("spell cast"));
-}
-
 #pragma region THROW
 void AThirdPersonCharacter::Throw()
 {
-	if (GetCharacterMovement()->IsFalling() || CharacterType == ECharacterClass::Wizard || CurrentItem == EItemType::None)
+	if(CharacterType == ECharacterClass::Wizard)
+	{
+		ThrowServer();
+		return;
+	}
+
+	if (GetCharacterMovement()->IsFalling() || CurrentItem == EItemType::None)
 		return;
 
 	ThrowServer();
@@ -267,6 +260,15 @@ void AThirdPersonCharacter::ThrowMulticast_Implementation()
 
 void AThirdPersonCharacter::TriggerThrow()
 {
+	if (CharacterType == ECharacterClass::Wizard)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("spell cast"));
+		CastSpell(); //blueprint function
+		bIsAttacking = false;
+		//decrement mana
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("throw object"));
 	if (Throwable)
 	{
