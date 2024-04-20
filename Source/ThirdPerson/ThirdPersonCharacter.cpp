@@ -94,11 +94,13 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Look);
 
+		//left click
 		// Attack
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Attack);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AThirdPersonCharacter::AttackServer);
 
+		//right click
 		// Throw //cast spell for wizard
-		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Throw);
+		EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Started, this, &AThirdPersonCharacter::ThrowServer);
 	}
 	else
 	{
@@ -143,114 +145,78 @@ void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 }
 
 #pragma region ATTACK
-void AThirdPersonCharacter::Attack()
+void AThirdPersonCharacter::AttackServer_Implementation()
 {
-	if (GetCharacterMovement()->IsFalling())
+	//UE_LOG(LogTemp, Warning, TEXT("left click"));
+	//UE_LOG(LogTemp, Warning, TEXT("bIsAttacking is %s"), (bIsAttacking ? TEXT("true") : TEXT("false")));
+	//TODO Cannot attack notify user with UI in above cases
+
+	AttackMulti();
+}
+
+void AThirdPersonCharacter::AttackMulti_Implementation()
+{
+	if (bIsAttacking || GetCharacterMovement()->IsFalling())
 		return;
+
 	if (CharacterType == ECharacterClass::Farmer)
 	{
-	    if (CurrentItem == EItemType::Weapon || CurrentItem == EItemType::Throwable)
-		    return;
+		if (CurrentItem == EItemType::Weapon || CurrentItem == EItemType::Throwable)
+			return;
 	}
 	if (CharacterType == ECharacterClass::Knight && CurrentItem == EItemType::Throwable)
 		return;
-	//TODO Cannot attack notify user with UI in above cases
-	AttackServer();
-}
-
-void AThirdPersonCharacter::AttackServer_Implementation()
-{
-	AttackMulticast();
-}
-
-void AThirdPersonCharacter::AttackMulticast_Implementation()
-{
-	if (bIsAttacking)
-		return;
-
 	bIsAttacking = true;
-
 	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::TriggerAttack, .8f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::Melee, .8f, false);
 }
-
-void AThirdPersonCharacter::TriggerAttack()
-{
-	//wizard can only melee in this case
-	switch(CurrentItem)
-	{
-	    case EItemType::None:
-	    {
-			Melee();
-			break;
-	    }
-	    case EItemType::Weapon://and class check knight here, play sword sound on hit
-		{
-			Melee();
-			break;
-		}
-	    case EItemType::Throwable:
-		{
-			Throw();
-			break;
-		}
-	    default:
-		{
-			Melee();
-			break;
-		}
-	}
-
-	bIsAttacking = false;
-}
-
 
 void AThirdPersonCharacter::Melee()
 {
-	UE_LOG(LogTemp, Warning, TEXT("melee"));
+	//UE_LOG(LogTemp, Warning, TEXT("left click"));
 	FVector location = GetMesh()->GetComponentLocation();
 	FVector rotation = UKismetMathLibrary::GetRightVector(GetMesh()->GetComponentRotation());
 
 	FHitResult hit;
 	bool bCollideObject = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), location, location + (rotation * 100), 20.f, objectTypesArray, false, actorsToIgnore, EDrawDebugTrace::None, hit, true);
 
-	UE_LOG(LogTemp, Warning, TEXT("hit is %s"), (bCollideObject ? TEXT("true") : TEXT("false")));
+	//UE_LOG(LogTemp, Warning, TEXT("hit is %s"), (bCollideObject ? TEXT("true") : TEXT("false")));
 	if (bCollideObject)
 	{
 		if (auto otherActor = Cast<AThirdPersonCharacter>(hit.GetActor()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("other actor %s"), *otherActor->GetPlayerState()->GetPlayerName());
+			//UE_LOG(LogTemp, Warning, TEXT("other actor %s"), *otherActor->GetPlayerState()->GetPlayerName());
 			otherActor->LaunchCharacter(rotation * 400, false, false);
 		}
 	}
+
+	bIsAttacking = false;
 }
 #pragma endregion
 
 #pragma region THROW
-void AThirdPersonCharacter::Throw()
-{
-	if(CharacterType == ECharacterClass::Wizard)
-	{
-		ThrowServer();
-		return;
-	}
-
-	if (GetCharacterMovement()->IsFalling() || CurrentItem == EItemType::None)
-		return;
-
-	ThrowServer();
-}
 
 void AThirdPersonCharacter::ThrowServer_Implementation()
 {
+	if (bIsAttacking || bIsCastingSpell || GetCharacterMovement()->IsFalling())
+		return;
+	//UE_LOG(LogTemp, Warning, TEXT("right click"));
+
+	if (CharacterType == ECharacterClass::Wizard)
+	{
+		bIsCastingSpell = true;
+		ThrowMulticast();
+		return;
+	}
+
+	if (CurrentItem == EItemType::None) //if no items and not wizard, return
+		return;
+
 	ThrowMulticast();
 }
 
 void AThirdPersonCharacter::ThrowMulticast_Implementation()
 {
-	if (bIsAttacking)
-		return;
-
 	bIsAttacking = true;
 
 	FTimerHandle TimerHandle;
@@ -260,20 +226,20 @@ void AThirdPersonCharacter::ThrowMulticast_Implementation()
 
 void AThirdPersonCharacter::TriggerThrow()
 {
+	//UE_LOG(LogTemp, Warning, TEXT("bool %d"), bIsCastingSpell);
 	if (CharacterType == ECharacterClass::Wizard)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("spell cast"));
 		CastSpell(); //blueprint function
 		bIsAttacking = false;
+		bIsCastingSpell = false;
 		//decrement mana
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("throw object"));
 	if (Throwable)
 	{
 		Throwable->SetActorEnableCollision(true);
-		//Throwable->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
         UBoxComponent* boxComp = Cast<UBoxComponent>(Throwable->GetRootComponent());
 		if (boxComp)
 		{
@@ -283,18 +249,9 @@ void AThirdPersonCharacter::TriggerThrow()
 			boxComp->SetPhysicsLinearVelocity(PlayerLocation.GetSafeNormal() * 1000.f);
 		}
 		AActor* ThrowableActor = Throwable;
-		//destroying both sword and throwable for now since it will cause issues with hitting player with sword
-		//if(CurrentItem==EItemType::Throwable) //destroy if throwable thrown
-		//{
-			FTimerHandle TimerHandle;
-			GetWorldTimerManager().SetTimer(TimerHandle, [ThrowableActor]() { ThrowableActor->Destroy(); }, 5.f, false);
-		//}
-		//else //else renable overlap collision detection
-		//{
-		//	FTimerHandle TimerHandle;
-		//	GetWorldTimerManager().SetTimer(TimerHandle, [boxComp]() {boxComp->SetCollisionProfileName("OverlapOnlyPawn"); }, 5.f, false);
-		//}
 
+	    FTimerHandle TimerHandle;
+	    GetWorldTimerManager().SetTimer(TimerHandle, [ThrowableActor]() { ThrowableActor->Destroy(); }, 5.f, false);
 	}
 
 	bIsAttacking = false;
@@ -303,3 +260,4 @@ void AThirdPersonCharacter::TriggerThrow()
 }
 
 #pragma endregion
+
