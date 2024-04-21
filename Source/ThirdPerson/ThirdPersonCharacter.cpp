@@ -215,6 +215,12 @@ void AThirdPersonCharacter::ThrowServer_Implementation()
 	ThrowMulticast();
 }
 
+
+bool AThirdPersonCharacter::ThrowServer_Validate()
+{
+	return !bIsAttacking;
+}
+
 void AThirdPersonCharacter::ThrowMulticast_Implementation()
 {
 	bIsAttacking = true;
@@ -222,7 +228,6 @@ void AThirdPersonCharacter::ThrowMulticast_Implementation()
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::TriggerThrow, .8f, false);
 }
-
 
 void AThirdPersonCharacter::TriggerThrow()
 {

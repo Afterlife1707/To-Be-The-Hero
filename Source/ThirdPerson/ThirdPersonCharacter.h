@@ -66,12 +66,6 @@ class AThirdPersonCharacter : public ACharacter
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<ECharacterClass> CharacterType = ECharacterClass::Default;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	bool bIsAttacking;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	bool bIsCastingSpell;
-
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
 	TArray<TObjectPtr<AActor>> actorsToIgnore;
@@ -93,13 +87,19 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	bool bIsAttacking;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	bool bIsCastingSpell;
+
 	UFUNCTION(Server, Reliable)
 	void AttackServer();
     UFUNCTION(NetMulticast, Reliable)
 	void AttackMulti();
 	
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ThrowServer();
 	UFUNCTION(NetMulticast, Reliable)
 	void ThrowMulticast();
