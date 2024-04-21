@@ -57,24 +57,27 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 {
     if(AThirdPersonCharacter* Character = Cast<AThirdPersonCharacter>(OtherActor); Character && Character->CurrentItem== EItemType::None)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Component hit"));
 		if (bIsEquippable)
 		{
+			if (Character->GetCharacterType() == ECharacterClass::Wizard)
+				return;
+
 			if (ItemType == EItemType::Weapon)
 				Character->CurrentItem = EItemType::Weapon;
 			else if (ItemType == EItemType::Throwable)
 				Character->CurrentItem = EItemType::Throwable;
+
 			Character->Throwable = this;
 			SetActorEnableCollision(false);
-			if (StaticMesh->GetStaticMesh())
-				StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
 		}
 		else
 		{
-			//UPDATE MANA
 			if(Character->GetCharacterType() == ECharacterClass::Wizard)
-			    Destroy();
+			{
+				//UPDATE MANA
+				Destroy();
+			}
 		}
 	}
 }
