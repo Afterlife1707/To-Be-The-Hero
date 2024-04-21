@@ -66,7 +66,6 @@ class AThirdPersonCharacter : public ACharacter
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<ECharacterClass> CharacterType = ECharacterClass::Default;
 
-
 	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
 	TArray<TObjectPtr<AActor>> actorsToIgnore;
 
@@ -76,7 +75,7 @@ public:
 	UFUNCTION(BlueprintGetter)
 	TEnumAsByte<ECharacterClass> GetCharacterType() const { return CharacterType; }
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = Combat)
 	TEnumAsByte<EItemType> CurrentItem = EItemType::None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TObjectPtr<AActor> Throwable;
@@ -88,10 +87,12 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+    virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	bool bIsAttacking;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	bool bIsCastingSpell;
 
 	UFUNCTION(Server, Reliable)

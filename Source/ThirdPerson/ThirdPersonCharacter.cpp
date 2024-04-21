@@ -14,6 +14,7 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -142,6 +143,15 @@ void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AThirdPersonCharacter, CurrentItem);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsAttacking);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsCastingSpell);
 }
 
 #pragma region ATTACK
