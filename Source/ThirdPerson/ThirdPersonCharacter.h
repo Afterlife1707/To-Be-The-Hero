@@ -79,6 +79,16 @@ public:
 	TEnumAsByte<EItemType> CurrentItem = EItemType::None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TObjectPtr<AActor> Throwable;
+
+	UPROPERTY(EditAnywhere, Category=Combat)
+	float FarmerWeaponThrowMultiplier = 1000.f;
+    UPROPERTY(EditAnywhere, Category = Combat)
+	float FarmerThrowableMultiplier = 1500.f;
+    UPROPERTY(EditAnywhere, Category = Combat)
+	float KnightWeaponThrowMultiplier = 1500.f;
+    UPROPERTY(EditAnywhere, Category = Combat)
+	float KnightThrowableMultiplier = 2000.f;
+
 protected:
 
 	/** Called for movement input */

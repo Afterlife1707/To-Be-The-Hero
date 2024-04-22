@@ -252,7 +252,7 @@ void AThirdPersonCharacter::TriggerThrow()
 		return;
 	}
 
-	if (Throwable)
+	if (Throwable && CurrentItem!=None)
 	{
 		Throwable->SetActorEnableCollision(true);
         UBoxComponent* boxComp = Cast<UBoxComponent>(Throwable->GetRootComponent());
@@ -261,7 +261,17 @@ void AThirdPersonCharacter::TriggerThrow()
 			const FVector PlayerLocation = GetActorForwardVector();
 			boxComp->SetSimulatePhysics(true);
 			boxComp->SetCollisionProfileName("BlockAll");
-			boxComp->SetPhysicsLinearVelocity(PlayerLocation.GetSafeNormal() * 1000.f);
+			float ThrowMultiplier = 1000.f;
+			switch (CurrentItem)
+			{
+			    case EItemType::Throwable:
+				    ThrowMultiplier = (CharacterType == ECharacterClass::Farmer)?FarmerThrowableMultiplier:KnightThrowableMultiplier;
+				    break;
+			    case EItemType::Weapon:
+				    ThrowMultiplier = (CharacterType == ECharacterClass::Farmer)?FarmerWeaponThrowMultiplier:KnightWeaponThrowMultiplier;
+				    break;
+			}
+			boxComp->SetPhysicsLinearVelocity(PlayerLocation.GetSafeNormal() * ThrowMultiplier);
 		}
 		AActor* ThrowableActor = Throwable;
 
@@ -270,7 +280,7 @@ void AThirdPersonCharacter::TriggerThrow()
 	}
 
 	bIsAttacking = false;
-	CurrentItem = EItemType::None; // empty after throw
+	CurrentItem = None; // empty after throw
 	Throwable = nullptr;
 }
 

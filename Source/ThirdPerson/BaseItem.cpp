@@ -55,6 +55,8 @@ void ABaseItem::Tick(float DeltaTime)
 void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (OtherActor == GetInstigator())
+		return;
     if(AThirdPersonCharacter* Character = Cast<AThirdPersonCharacter>(OtherActor); Character && Character->CurrentItem== EItemType::None)
 	{
 		if (bIsEquippable)
@@ -67,9 +69,11 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 			else if (ItemType == EItemType::Throwable)
 				Character->CurrentItem = EItemType::Throwable;
 
+			UE_LOG(LogTemp, Warning, TEXT("picked up item"));
 			Character->Throwable = this;
 			SetActorEnableCollision(false);
 			AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
+			SetInstigator(Character);
 		}
 		else
 		{
