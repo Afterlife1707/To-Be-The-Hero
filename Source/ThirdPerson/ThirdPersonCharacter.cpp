@@ -220,11 +220,11 @@ void AThirdPersonCharacter::ThrowServer_Implementation()
 		ThrowMulticast();
 		return;
 	}
-    bIsThrowing = true;
 
 	if (CurrentItem == EItemType::None) //if no items and not wizard, return
 		return;
 
+	bIsThrowing = true;
 	ThrowMulticast();
 }
 

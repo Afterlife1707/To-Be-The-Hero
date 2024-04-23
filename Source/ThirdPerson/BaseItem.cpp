@@ -59,6 +59,8 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 		return;
     if(AThirdPersonCharacter* Character = Cast<AThirdPersonCharacter>(OtherActor); Character && Character->CurrentItem== EItemType::None)
 	{
+		if (Character->CurrentItem != None)
+			return;
 		if (bIsEquippable)
 		{
 			if (Character->GetCharacterType() == ECharacterClass::Wizard)
