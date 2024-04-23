@@ -258,10 +258,7 @@ void AThirdPersonCharacter::TriggerThrow()
         UBoxComponent* boxComp = Cast<UBoxComponent>(Throwable->GetRootComponent());
 		if (boxComp)
 		{
-		    FVector PlayerLocation = GetActorForwardVector();
-			PlayerLocation.Normalize();
-
-			UE_LOG(LogTemp, Warning, TEXT("player loc : %s"), *PlayerLocation.ToString());
+            const FVector PlayerLocation = GetActorForwardVector();
 			boxComp->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, "throwSocket");
 			boxComp->SetSimulatePhysics(true);
 			boxComp->SetCollisionProfileName("BlockAll");
@@ -275,7 +272,8 @@ void AThirdPersonCharacter::TriggerThrow()
 				    ThrowMultiplier = (CharacterType == ECharacterClass::Farmer)?FarmerWeaponThrowMultiplier:KnightWeaponThrowMultiplier;
 				    break;
 			}
-		    boxComp->SetPhysicsLinearVelocity(PlayerLocation * ThrowMultiplier);
+			if (auto item = Cast<ABaseItem>(Throwable)) item->InstigatorForwardVector = GetActorForwardVector();
+		    boxComp->SetPhysicsLinearVelocity(PlayerLocation.GetSafeNormal() * ThrowMultiplier);
 		}
 		AActor* ThrowableActor = Throwable;
 
