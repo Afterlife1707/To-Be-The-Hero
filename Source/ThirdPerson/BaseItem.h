@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "BaseItem.generated.h"
 
+class UProjectileMovementComponent;
+
 UENUM()
 enum EItemType
 {

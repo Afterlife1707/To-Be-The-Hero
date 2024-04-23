@@ -5,6 +5,7 @@
 
 #include "ThirdPersonCharacter.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -15,8 +16,6 @@ ABaseItem::ABaseItem()
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-
-	RootComponent = BoxCollision;
 	StaticMesh->SetupAttachment(RootComponent);
 	bReplicates = true;
 }
@@ -53,14 +52,12 @@ void ABaseItem::Tick(float DeltaTime)
 }
 
 void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == GetInstigator())
 		return;
     if(AThirdPersonCharacter* Character = Cast<AThirdPersonCharacter>(OtherActor); Character && Character->CurrentItem== EItemType::None)
 	{
-		if (Character->CurrentItem != None)
-			return;
 		if (bIsEquippable)
 		{
 			if (Character->GetCharacterType() == ECharacterClass::Wizard)
