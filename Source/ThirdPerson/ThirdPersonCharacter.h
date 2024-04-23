@@ -72,6 +72,9 @@ class AThirdPersonCharacter : public ACharacter
 public:
 	AThirdPersonCharacter();
 
+	//UFUNCTION(BlueprintCallable,Category=Combat)
+	//void PlayerHit();
+
 	UFUNCTION(BlueprintGetter)
 	TEnumAsByte<ECharacterClass> GetCharacterType() const { return CharacterType; }
 
@@ -104,6 +107,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	bool bIsCastingSpell;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
+	bool bIsThrowing;
 
 	UFUNCTION(Server, Reliable)
 	void AttackServer();

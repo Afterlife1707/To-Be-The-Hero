@@ -152,6 +152,7 @@ void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AThirdPersonCharacter, CurrentItem);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsAttacking);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsCastingSpell);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsThrowing);
 }
 
 #pragma region ATTACK
@@ -159,14 +160,14 @@ void AThirdPersonCharacter::AttackServer_Implementation()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("left click"));
 	//UE_LOG(LogTemp, Warning, TEXT("bIsAttacking is %s"), (bIsAttacking ? TEXT("true") : TEXT("false")));
-	//TODO Cannot attack notify user with UI in above cases
+	//TODO Cannot attack, notify user with UI in above cases
 
 	AttackMulti();
 }
 
 void AThirdPersonCharacter::AttackMulti_Implementation()
 {
-	if (bIsAttacking || GetCharacterMovement()->IsFalling())
+	if (bIsThrowing || bIsAttacking || GetCharacterMovement()->IsFalling())
 		return;
 
 	if (CharacterType == ECharacterClass::Farmer)
@@ -208,7 +209,7 @@ void AThirdPersonCharacter::Melee()
 
 void AThirdPersonCharacter::ThrowServer_Implementation()
 {
-	if (bIsAttacking || bIsCastingSpell || GetCharacterMovement()->IsFalling())
+	if (bIsThrowing || bIsAttacking || bIsCastingSpell || GetCharacterMovement()->IsFalling())
 		return;
 	//UE_LOG(LogTemp, Warning, TEXT("right click"));
 
@@ -233,8 +234,7 @@ bool AThirdPersonCharacter::ThrowServer_Validate()
 
 void AThirdPersonCharacter::ThrowMulticast_Implementation()
 {
-	bIsAttacking = true;
-
+	bIsThrowing = true;
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::TriggerThrow, .8f, false);
 }
@@ -246,7 +246,7 @@ void AThirdPersonCharacter::TriggerThrow()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("spell cast"));
 		CastSpell(); //blueprint function
-		bIsAttacking = false;
+		bIsThrowing = false;
 		bIsCastingSpell = false;
 		//decrement mana
 		return;
@@ -279,7 +279,7 @@ void AThirdPersonCharacter::TriggerThrow()
 	    GetWorldTimerManager().SetTimer(TimerHandle, [ThrowableActor]() { ThrowableActor->Destroy(); }, 5.f, false);
 	}
 
-	bIsAttacking = false;
+	bIsThrowing = false;
 	CurrentItem = None; // empty after throw
 	Throwable = nullptr;
 }
