@@ -111,9 +111,10 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 {
+	if (bIsThrowing || bIsAttacking || bIsCastingSpell)
+		return;
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
 	if (Controller != nullptr && !bIsAttacking)
 	{
 		// find out which way is forward
@@ -219,6 +220,7 @@ void AThirdPersonCharacter::ThrowServer_Implementation()
 		ThrowMulticast();
 		return;
 	}
+    bIsThrowing = true;
 
 	if (CurrentItem == EItemType::None) //if no items and not wizard, return
 		return;
@@ -234,7 +236,6 @@ bool AThirdPersonCharacter::ThrowServer_Validate()
 
 void AThirdPersonCharacter::ThrowMulticast_Implementation()
 {
-	bIsThrowing = true;
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::TriggerThrow, .8f, false);
 }
@@ -246,7 +247,6 @@ void AThirdPersonCharacter::TriggerThrow()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("spell cast"));
 		CastSpell(); //blueprint function
-		bIsThrowing = false;
 		bIsCastingSpell = false;
 		//decrement mana
 		return;
