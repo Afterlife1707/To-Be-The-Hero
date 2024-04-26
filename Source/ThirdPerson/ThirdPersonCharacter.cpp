@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "KismetTraceUtils.h"
 #include "Components/BoxComponent.h"
+#include "Components/ProgressBar.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -216,6 +217,8 @@ void AThirdPersonCharacter::ThrowServer_Implementation()
 
 	if (CharacterType == ECharacterClass::Wizard)
 	{
+		if (Mana == 0)
+			return;
 		bIsCastingSpell = true;
 		ThrowMulticast();
 		return;
@@ -248,7 +251,8 @@ void AThirdPersonCharacter::TriggerThrow()
 		UE_LOG(LogTemp, Warning, TEXT("spell cast"));
 		CastSpell(); //blueprint function
 		bIsCastingSpell = false;
-		//decrement mana
+		if (--Mana <= 0) Mana = 0;
+		UpdateManaUI();
 		return;
 	}
 
@@ -287,4 +291,17 @@ void AThirdPersonCharacter::TriggerThrow()
 }
 
 #pragma endregion
+
+void AThirdPersonCharacter::IncrementMana()
+{
+	if (++Mana > MaxMana)
+		Mana = MaxMana;
+	UpdateManaUI();
+}
+
+void AThirdPersonCharacter::UpdateManaUI()
+{
+	if(ManaBar)
+	    ManaBar->SetPercent(Mana / MaxMana);
+}
 

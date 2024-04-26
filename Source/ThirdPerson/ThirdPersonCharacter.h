@@ -62,12 +62,15 @@ class AThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ThrowAction;
 
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<ECharacterClass> CharacterType = ECharacterClass::Default;
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
 	TArray<TObjectPtr<AActor>> actorsToIgnore;
+
+	float Mana = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	float MaxMana = 3;
 
 public:
 	AThirdPersonCharacter();
@@ -92,6 +95,13 @@ public:
     UPROPERTY(EditAnywhere, Category = Combat)
 	float KnightThrowableMultiplier = 2000.f;
 
+	void IncrementMana();
+	void UpdateManaUI();
+	float GetMana() { return Mana; }
+	float GetMaxMana() { return MaxMana; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	class UProgressBar* ManaBar;
 protected:
 
 	/** Called for movement input */

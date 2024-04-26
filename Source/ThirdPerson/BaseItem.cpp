@@ -16,6 +16,7 @@ ABaseItem::ABaseItem()
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	RootComponent = BoxCollision;
 	StaticMesh->SetupAttachment(RootComponent);
 	bReplicates = true;
 }
@@ -79,7 +80,11 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 			if(Character->GetCharacterType() == ECharacterClass::Wizard)
 			{
 				//UPDATE MANA
-				Destroy();
+				if(Character->GetMana()!=Character->GetMaxMana())
+				{
+					Character->IncrementMana();
+					Destroy();
+				}
 			}
 		}
 	}
