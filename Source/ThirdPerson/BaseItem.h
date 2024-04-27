@@ -8,7 +8,7 @@
 
 class UProjectileMovementComponent;
 
-UENUM()
+UENUM(BlueprintType)
 enum EItemType
 {
     Weapon,

@@ -162,7 +162,6 @@ void AThirdPersonCharacter::AttackServer_Implementation()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("left click"));
 	//UE_LOG(LogTemp, Warning, TEXT("bIsAttacking is %s"), (bIsAttacking ? TEXT("true") : TEXT("false")));
-	//TODO Cannot attack, notify user with UI in above cases
 
 	AttackMulti();
 }
@@ -193,12 +192,15 @@ void AThirdPersonCharacter::Melee()
 	FHitResult hit;
 	bool bCollideObject = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), location, location + (rotation * 100), 20.f, objectTypesArray, false, actorsToIgnore, EDrawDebugTrace::None, hit, true);
 
+	PlayAttackSoundEffect(); //blueprint function
+
 	//UE_LOG(LogTemp, Warning, TEXT("hit is %s"), (bCollideObject ? TEXT("true") : TEXT("false")));
 	if (bCollideObject)
 	{
 		if (auto otherActor = Cast<AThirdPersonCharacter>(hit.GetActor()))
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("other actor %s"), *otherActor->GetPlayerState()->GetPlayerName());
+			PlayGotHitSoundEffect(hit.GetActor());
 			otherActor->LaunchCharacter(rotation * 400, false, false);
 		}
 	}
@@ -258,6 +260,7 @@ void AThirdPersonCharacter::TriggerThrow()
 
 	if (Throwable && CurrentItem!=None)
 	{
+		PlayAttackSoundEffect(); //blueprint function
 		Throwable->SetActorEnableCollision(true);
         UBoxComponent* boxComp = Cast<UBoxComponent>(Throwable->GetRootComponent());
 		if (boxComp)

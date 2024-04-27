@@ -32,16 +32,11 @@ void ABaseItem::BeginPlay()
 		return;
 	if(bIsBaseItem)
 	{
-		//if (UKismetMathLibrary::RandomBool())
-		//{
-			int32 rand = UKismetMathLibrary::RandomIntegerInRange(0, AllChildClasses.Num() - 1);
-			const TSubclassOf<ABaseItem> RandomClassItemToSpawn = AllChildClasses[rand];
-            if(ABaseItem* ItemRef = GetWorld()->SpawnActor<ABaseItem>(RandomClassItemToSpawn, GetActorTransform()))
-				ItemRef->bIsBaseItem = false;
-			Destroy();
-		//}
-		//else
-			//Destroy();
+		int32 rand = UKismetMathLibrary::RandomIntegerInRange(0, AllChildClasses.Num() - 1);
+		const TSubclassOf<ABaseItem> RandomClassItemToSpawn = AllChildClasses[rand];
+        if(ABaseItem* ItemRef = GetWorld()->SpawnActor<ABaseItem>(RandomClassItemToSpawn, GetActorTransform()))
+			ItemRef->bIsBaseItem = false;
+		Destroy();
 	}
 }
 
@@ -79,7 +74,6 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 		{
 			if(Character->GetCharacterType() == ECharacterClass::Wizard)
 			{
-				//UPDATE MANA
 				if(Character->GetMana()!=Character->GetMaxMana())
 				{
 					Character->IncrementMana();

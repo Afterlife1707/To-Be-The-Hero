@@ -135,6 +135,11 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category=Combat, meta = (AllowPrivateAccess = "true"))
 	void CastSpell();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	void PlayAttackSoundEffect();
+	UFUNCTION(BlueprintImplementableEvent, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	void PlayGotHitSoundEffect(AActor* HitByActor);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
