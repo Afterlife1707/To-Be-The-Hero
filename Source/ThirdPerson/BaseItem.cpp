@@ -56,15 +56,12 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		if (bIsEquippable)
 		{
-			if (Character->GetCharacterType() == ECharacterClass::Wizard)
+			if (Character->GetCurrentCharacterType() == ECharacterClass::Wizard)
 				return;
 
-			if (ItemType == EItemType::Weapon)
-				Character->CurrentItem = EItemType::Weapon;
-			else if (ItemType == EItemType::Throwable)
-				Character->CurrentItem = EItemType::Throwable;
-
-			UE_LOG(LogTemp, Warning, TEXT("picked up item"));
+			Character->CurrentItem = ItemType;
+			socketName = ItemType == Weapon ? "weapon_socket" : "throwable_socket";
+			UE_LOG(LogTemp, Warning, TEXT("picked up item by %d"), Character->GetCurrentCharacterType().GetValue());
 			Character->Throwable = this;
 			SetActorEnableCollision(false);
 			AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, socketName);
@@ -72,7 +69,7 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 		}
 		else
 		{
-			if(Character->GetCharacterType() == ECharacterClass::Wizard)
+			if(Character->GetCurrentCharacterType() == ECharacterClass::Wizard)
 			{
 				if(Character->GetMana()!=Character->GetMaxMana())
 				{

@@ -155,6 +155,7 @@ void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AThirdPersonCharacter, bIsAttacking);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsCastingSpell);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsThrowing);
+	DOREPLIFETIME(AThirdPersonCharacter, CurrentCharacterType);
 }
 
 #pragma region ATTACK
@@ -171,16 +172,14 @@ void AThirdPersonCharacter::AttackMulti_Implementation()
 	if (bIsThrowing || bIsAttacking || GetCharacterMovement()->IsFalling())
 		return;
 
-	if (CharacterType == ECharacterClass::Farmer)
-	{
-		if (CurrentItem == EItemType::Weapon || CurrentItem == EItemType::Throwable)
-			return;
-	}
-	if (CharacterType == ECharacterClass::Knight && CurrentItem == EItemType::Throwable)
+	if (CurrentItem == EItemType::Throwable)
 		return;
+	if (CurrentCharacterType == ECharacterClass::Farmer && CurrentItem == EItemType::Weapon)
+		return;
+
 	bIsAttacking = true;
 	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::Melee, .8f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &AThirdPersonCharacter::Melee, .5f, false);
 }
 
 void AThirdPersonCharacter::Melee()
@@ -199,7 +198,6 @@ void AThirdPersonCharacter::Melee()
 	{
 		if (auto otherActor = Cast<AThirdPersonCharacter>(hit.GetActor()))
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("other actor %s"), *otherActor->GetPlayerState()->GetPlayerName());
 			PlayGotHitSoundEffect(hit.GetActor());
 			otherActor->LaunchCharacter(rotation * 400, false, false);
 		}
@@ -217,13 +215,16 @@ void AThirdPersonCharacter::ThrowServer_Implementation()
 		return;
 	//UE_LOG(LogTemp, Warning, TEXT("right click"));
 
-	if (CharacterType == ECharacterClass::Wizard)
+	if (CurrentCharacterType == ECharacterClass::Wizard)
 	{
 		if (Mana == 0)
 			return;
-		bIsCastingSpell = true;
-		ThrowMulticast();
-		return;
+		if(!bIsCastingSpell)
+		{
+			bIsCastingSpell = true;
+			ThrowMulticast();
+			return;
+		}
 	}
 
 	if (CurrentItem == EItemType::None) //if no items and not wizard, return
@@ -248,7 +249,7 @@ void AThirdPersonCharacter::ThrowMulticast_Implementation()
 void AThirdPersonCharacter::TriggerThrow()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("bool %d"), bIsCastingSpell);
-	if (CharacterType == ECharacterClass::Wizard)
+	if (CurrentCharacterType == ECharacterClass::Wizard)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("spell cast"));
 		CastSpell(); //blueprint function
@@ -273,10 +274,10 @@ void AThirdPersonCharacter::TriggerThrow()
 			switch (CurrentItem)
 			{
 			    case EItemType::Throwable:
-				    ThrowMultiplier = (CharacterType == ECharacterClass::Farmer)?FarmerThrowableMultiplier:KnightThrowableMultiplier;
+				    ThrowMultiplier = (CurrentCharacterType == ECharacterClass::Farmer)?FarmerThrowableMultiplier:KnightThrowableMultiplier;
 				    break;
 			    case EItemType::Weapon:
-				    ThrowMultiplier = (CharacterType == ECharacterClass::Farmer)?FarmerWeaponThrowMultiplier:KnightWeaponThrowMultiplier;
+				    ThrowMultiplier = (CurrentCharacterType == ECharacterClass::Farmer)?FarmerWeaponThrowMultiplier:KnightWeaponThrowMultiplier;
 				    break;
 			}
 			if (auto item = Cast<ABaseItem>(Throwable)) item->InstigatorForwardVector = GetActorForwardVector();

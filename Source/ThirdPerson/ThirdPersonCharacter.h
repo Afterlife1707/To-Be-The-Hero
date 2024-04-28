@@ -62,8 +62,8 @@ class AThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ThrowAction;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	TEnumAsByte<ECharacterClass> CharacterType = ECharacterClass::Default;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"), Replicated)
+	TEnumAsByte<ECharacterClass> CurrentCharacterType = ECharacterClass::Default;
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypesArray;
 	TArray<TObjectPtr<AActor>> actorsToIgnore;
@@ -75,11 +75,8 @@ class AThirdPersonCharacter : public ACharacter
 public:
 	AThirdPersonCharacter();
 
-	//UFUNCTION(BlueprintCallable,Category=Combat)
-	//void PlayerHit();
-
-	UFUNCTION(BlueprintGetter)
-	TEnumAsByte<ECharacterClass> GetCharacterType() const { return CharacterType; }
+	UFUNCTION(BlueprintGetter, Category = Combat)
+	TEnumAsByte<ECharacterClass> GetCurrentCharacterType() const { return CurrentCharacterType; };
 
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = Combat)
 	TEnumAsByte<EItemType> CurrentItem = EItemType::None;
