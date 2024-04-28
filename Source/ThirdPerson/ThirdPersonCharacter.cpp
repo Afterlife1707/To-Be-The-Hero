@@ -93,6 +93,12 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Move);
 
+		// Sprint
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Ongoing, this, &AThirdPersonCharacter::Sprint);
+
+		// Unsprint
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::None, this, &AThirdPersonCharacter::UnSprint);
+
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AThirdPersonCharacter::Look);
 
@@ -136,6 +142,8 @@ void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 
 void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 {
+	if (bIsAttacking || bIsThrowing || bIsCastingSpell)
+		return;
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
@@ -145,6 +153,28 @@ void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AThirdPersonCharacter::Sprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	SprintServer();
+}
+
+void AThirdPersonCharacter::UnSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	UnsprintServer();
+}
+
+void AThirdPersonCharacter::SprintServer_Implementation()
+{
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+}
+
+void AThirdPersonCharacter::UnsprintServer_Implementation()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
