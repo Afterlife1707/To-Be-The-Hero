@@ -20,7 +20,7 @@ enum ECharacterClass
 {
 	Knight,
 	Wizard,
-	Farmer,
+	Rogue,
 	Default
 };
 
@@ -88,9 +88,9 @@ public:
 	TObjectPtr<AActor> Throwable;
 
 	UPROPERTY(EditAnywhere, Category=Combat)
-	float FarmerWeaponThrowMultiplier = 1000.f;
+	float RogueWeaponThrowMultiplier = 1000.f;
     UPROPERTY(EditAnywhere, Category = Combat)
-	float FarmerThrowableMultiplier = 1500.f;
+	float RogueThrowableMultiplier = 1500.f;
     UPROPERTY(EditAnywhere, Category = Combat)
 	float KnightWeaponThrowMultiplier = 1500.f;
     UPROPERTY(EditAnywhere, Category = Combat)

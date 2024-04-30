@@ -204,7 +204,7 @@ void AThirdPersonCharacter::AttackMulti_Implementation()
 
 	if (CurrentItem == EItemType::Throwable)
 		return;
-	if (CurrentCharacterType == ECharacterClass::Farmer && CurrentItem == EItemType::Weapon)
+	if (CurrentCharacterType == ECharacterClass::Rogue && CurrentItem == EItemType::Weapon)
 		return;
 
 	bIsAttacking = true;
@@ -304,10 +304,10 @@ void AThirdPersonCharacter::TriggerThrow()
 			switch (CurrentItem)
 			{
 			    case EItemType::Throwable:
-				    ThrowMultiplier = (CurrentCharacterType == ECharacterClass::Farmer)?FarmerThrowableMultiplier:KnightThrowableMultiplier;
+				    ThrowMultiplier = (CurrentCharacterType == ECharacterClass::Rogue)?RogueThrowableMultiplier:KnightThrowableMultiplier;
 				    break;
 			    case EItemType::Weapon:
-				    ThrowMultiplier = (CurrentCharacterType == ECharacterClass::Farmer)?FarmerWeaponThrowMultiplier:KnightWeaponThrowMultiplier;
+				    ThrowMultiplier = (CurrentCharacterType == ECharacterClass::Rogue)?RogueWeaponThrowMultiplier:KnightWeaponThrowMultiplier;
 				    break;
 			}
 			if (auto item = Cast<ABaseItem>(Throwable)) item->InstigatorForwardVector = GetActorForwardVector();
