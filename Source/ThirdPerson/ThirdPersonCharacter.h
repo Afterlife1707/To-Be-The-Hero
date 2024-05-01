@@ -103,6 +103,24 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	class UProgressBar* ManaBar;
+
+	//HORSE
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horse, Replicated, meta = (AllowPrivateAccess = "true"))
+	bool bIsRiding;
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Horse)
+	void ServerMountHorse(class AHorseThirdPerson* Horse);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Horse)
+	void ServerDismountHorse(class AHorseThirdPerson* Horse);
+
+	// Function called on input to mount the horse
+	UFUNCTION(BlueprintCallable, Category = Horse)
+	void MountHorse(class AHorseThirdPerson* Horse);
+
+	// Function called on input to dismount the horse
+	UFUNCTION(BlueprintCallable, Category = Horse)
+	void DismountHorse(class AHorseThirdPerson* Horse);
+
 protected:
 
 	/** Called for movement input */

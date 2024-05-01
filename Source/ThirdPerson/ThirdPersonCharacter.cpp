@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "HorseThirdPerson.h"
 #include "InputActionValue.h"
 #include "KismetTraceUtils.h"
 #include "Components/BoxComponent.h"
@@ -186,6 +187,7 @@ void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AThirdPersonCharacter, bIsCastingSpell);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsThrowing);
 	DOREPLIFETIME(AThirdPersonCharacter, CurrentCharacterType);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsRiding);
 }
 
 #pragma region ATTACK
@@ -339,3 +341,47 @@ void AThirdPersonCharacter::UpdateManaUI()
 	    ManaBar->SetPercent(Mana / MaxMana);
 }
 
+void AThirdPersonCharacter::MountHorse(AHorseThirdPerson* Horse)
+{
+	if (Horse)
+	{
+		// Call the server function to mount the horse
+		if (GetLocalRole() < ROLE_Authority)
+		{
+			ServerMountHorse(Horse);
+		}
+		else
+		{
+			// If the server, directly call the mounting function
+			Horse->MountHorse(GetController());
+		}
+	}
+}
+
+void AThirdPersonCharacter::DismountHorse(AHorseThirdPerson* Horse)
+{
+	if (Horse)
+	{
+		// Call the server function to dismount the horse
+		if (GetLocalRole() < ROLE_Authority)
+		{
+			ServerDismountHorse(Horse);
+		}
+		else
+		{
+			// If the server, directly call the dismounting function
+			Horse->DismountHorse();
+		}
+	}
+}
+
+void AThirdPersonCharacter::ServerMountHorse_Implementation(AHorseThirdPerson* Horse)
+{
+	MountHorse(Horse);
+	bIsRiding = true;
+}
+void AThirdPersonCharacter::ServerDismountHorse_Implementation(AHorseThirdPerson* Horse)
+{
+	DismountHorse(Horse);
+	bIsRiding = false;
+}
