@@ -3,16 +3,13 @@
 
 #include "HorseThirdPerson.h"
 
-#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
 
 
 AHorseThirdPerson::AHorseThirdPerson()
 {
-    SitPos = CreateDefaultSubobject<USceneComponent>(TEXT("SitPos"));
     UnmountPos = CreateDefaultSubobject<USceneComponent>(TEXT("UnmountPos"));
-
-    SitPos->SetupAttachment(RootComponent);
     UnmountPos->SetupAttachment(RootComponent);
 
     bReplicates = true;
@@ -39,16 +36,9 @@ void AHorseThirdPerson::MountHorse(AController* NewRiderController)
         bIsMounted = true;
         OldPawn = NewRiderController->GetPawn();
         RiderController = NewRiderController;
-        if(auto Character = Cast<AThirdPersonCharacter>(NewRiderController->GetCharacter()))
+        if (auto Character = Cast<AThirdPersonCharacter>(NewRiderController->GetCharacter()))
         {
-            if(auto Capsule = Cast<UCapsuleComponent>(Character->GetRootComponent()))
-            {
-                //Capsule->SetEnableGravity(false);
-                UE_LOG(LogTemp, Warning, TEXT("capsule"));
-               // Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-            }
             Character->SetActorEnableCollision(false);
-            //Character->SetActorLocation(SitPos->GetComponentLocation());
             Character->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "sitSocket");
         }
         RiderController->Possess(this);
@@ -61,10 +51,12 @@ void AHorseThirdPerson::DismountHorse()
     {
         UE_LOG(LogTemp, Warning, TEXT("dismount"));
         bIsMounted = false;
+        GetCharacterMovement()->Velocity = FVector::Zero();
         if (auto Character = Cast<AThirdPersonCharacter>(OldPawn))
         {
             Character->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
             Character->SetActorEnableCollision(true);
+            //Character->bIsCollisionEnabled = true;
             Character->SetActorLocation(UnmountPos->GetComponentLocation());
             Character->bIsRiding = false;
         }
@@ -73,7 +65,6 @@ void AHorseThirdPerson::DismountHorse()
         bIsRiding = false;
     }
 }
-
 
 void AHorseThirdPerson::OnRep_RiderController()
 {

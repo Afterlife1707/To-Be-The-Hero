@@ -105,7 +105,7 @@ public:
 	class UProgressBar* ManaBar;
 
 	//HORSE
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horse, Replicated, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horse, ReplicatedUsing=OnRep_IsRiding, meta = (AllowPrivateAccess = "true"))
 	bool bIsRiding;
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = Horse)
 	void ServerMountHorse(class AHorseThirdPerson* Horse);
@@ -120,6 +120,9 @@ public:
 	// Function called on input to dismount the horse
 	UFUNCTION(BlueprintCallable, Category = Horse)
 	void DismountHorse(class AHorseThirdPerson* Horse);
+
+	UFUNCTION(Category = Horse)
+	void OnRep_IsRiding();
 
 protected:
 
@@ -138,8 +141,6 @@ protected:
 	void SprintServer();
     UFUNCTION(Server, Unreliable)
 	void UnsprintServer();
-
-    virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed = 150.f;
@@ -179,6 +180,8 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 public:
 	/** Returns CameraBoom subobject **/

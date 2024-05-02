@@ -82,6 +82,7 @@ void AThirdPersonCharacter::BeginPlay()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
+
 void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -380,8 +381,25 @@ void AThirdPersonCharacter::ServerMountHorse_Implementation(AHorseThirdPerson* H
 	MountHorse(Horse);
 	bIsRiding = true;
 }
+
 void AThirdPersonCharacter::ServerDismountHorse_Implementation(AHorseThirdPerson* Horse)
 {
 	DismountHorse(Horse);
 	bIsRiding = false;
+}
+
+void AThirdPersonCharacter::OnRep_IsRiding()
+{
+	UE_LOG(LogTemp, Warning, TEXT("on rep riding"));
+	if (!bIsRiding)
+	{
+		SetActorEnableCollision(true);
+		GetCharacterMovement()->GravityScale = 1.f;
+	}
+	else
+	{
+		GetCharacterMovement()->Velocity = FVector::Zero();
+		SetActorEnableCollision(false);
+		GetCharacterMovement()->GravityScale = 0;
+	}
 }

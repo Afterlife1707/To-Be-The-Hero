@@ -3,6 +3,7 @@
 
 #include "BaseItem.h"
 
+#include "HorseThirdPerson.h"
 #include "ThirdPersonCharacter.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -20,8 +21,6 @@ ABaseItem::ABaseItem()
 	StaticMesh->SetupAttachment(RootComponent);
 	bReplicates = true;
 }
-
-
 
 // Called when the game starts or when spawned
 void ABaseItem::BeginPlay()
@@ -54,6 +53,8 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 		return;
     if(AThirdPersonCharacter* Character = Cast<AThirdPersonCharacter>(OtherActor); Character && Character->CurrentItem== EItemType::None)
 	{
+		if (Cast<AHorseThirdPerson>(Character)) //if character is mounted on the horse
+			return;
 		if (bIsEquippable)
 		{
 			if (Character->GetCurrentCharacterType() == ECharacterClass::Wizard)

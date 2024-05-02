@@ -7,15 +7,13 @@
 #include "HorseThirdPerson.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class THIRDPERSON_API AHorseThirdPerson : public AThirdPersonCharacter
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mount,meta = (AllowPrivateAccess = "true"))
-    USceneComponent* SitPos;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mount, meta = (AllowPrivateAccess = "true"))
     USceneComponent* UnmountPos;
 
@@ -33,17 +31,15 @@ protected:
     virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 private:
-    // Boolean to track if the horse is currently mounted
-    UPROPERTY(EditAnywhere, Category=Mount, Replicated)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, Replicated, meta = (AllowPrivateAccess = "true"))
     bool bIsMounted;
 
-    // Reference to the rider controller
-    UPROPERTY(EditAnywhere, Category = Mount, ReplicatedUsing = OnRep_RiderController)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, ReplicatedUsing = OnRep_RiderController, meta = (AllowPrivateAccess = "true"))
     AController* RiderController;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, meta = (AllowPrivateAccess = "true"))
     APawn* OldPawn;
 
-    // Replicated function to handle changes to the rider controller
     UFUNCTION()
     void OnRep_RiderController();
 
