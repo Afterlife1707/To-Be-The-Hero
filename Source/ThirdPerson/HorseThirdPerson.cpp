@@ -32,7 +32,7 @@ void AHorseThirdPerson::MountHorse(AController* NewRiderController)
 {
     if (NewRiderController && !bIsMounted && HasAuthority())
     {
-        UE_LOG(LogTemp, Warning, TEXT("mount"));
+        //UE_LOG(LogTemp, Warning, TEXT("mount"));
         bIsMounted = true;
         OldPawn = NewRiderController->GetPawn();
         RiderController = NewRiderController;
@@ -49,14 +49,13 @@ void AHorseThirdPerson::DismountHorse()
 {
     if (RiderController && bIsMounted)
     {
-        UE_LOG(LogTemp, Warning, TEXT("dismount"));
+        //UE_LOG(LogTemp, Warning, TEXT("dismount"));
         bIsMounted = false;
         GetCharacterMovement()->Velocity = FVector::Zero();
         if (auto Character = Cast<AThirdPersonCharacter>(OldPawn))
         {
             Character->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
             Character->SetActorEnableCollision(true);
-            //Character->bIsCollisionEnabled = true;
             Character->SetActorLocation(UnmountPos->GetComponentLocation());
             Character->bIsRiding = false;
         }
@@ -68,7 +67,6 @@ void AHorseThirdPerson::DismountHorse()
 
 void AHorseThirdPerson::OnRep_RiderController()
 {
-    // Handle replication of rider controller changes
     if (RiderController)
     {
         RiderController->Possess(this);

@@ -140,6 +140,8 @@ void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
+		if (GetCharacterMovement()->IsFalling())
+			return;
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
 }
