@@ -166,6 +166,9 @@ protected:
 	UFUNCTION(Category = Combat)
 	void OnRep_IsInWater();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
+	bool bHitByFairy;
+
 	UFUNCTION(Server, Reliable)
 	void AttackServer();
     UFUNCTION(NetMulticast, Reliable)

@@ -138,11 +138,11 @@ void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
+		// add movement
+		AddMovementInput(bHitByFairy ? -ForwardDirection : ForwardDirection, MovementVector.Y);
 		if (GetCharacterMovement()->IsFalling())
 			return;
-		AddMovementInput(RightDirection, MovementVector.X);
+		AddMovementInput(bHitByFairy ? -RightDirection:RightDirection, MovementVector.X);
 	}
 }
 
@@ -156,8 +156,8 @@ void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 	if (Controller != nullptr)
 	{
 		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		AddControllerYawInput(bHitByFairy ? -LookAxisVector.X : LookAxisVector.X);
+		AddControllerPitchInput(bHitByFairy ? -LookAxisVector.Y: LookAxisVector.Y);
 	}
 }
 
