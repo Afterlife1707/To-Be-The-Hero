@@ -142,10 +142,15 @@ protected:
     UFUNCTION(Server, Unreliable)
 	void UnsprintServer();
 
+	float OriginalWalkSpeed, OriginalSprintSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed = 150.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed = 350.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
+	float WaterWalkSpeed = 80.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
+	float WaterSprintSpeed = 250.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	bool bIsAttacking;
 
@@ -154,6 +159,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	bool bIsThrowing;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, ReplicatedUsing= OnRep_IsInWater, meta = (AllowPrivateAccess = "true"))
+	bool bIsInWater;
+
+	UFUNCTION(Category = Combat)
+	void OnRep_IsInWater();
 
 	UFUNCTION(Server, Reliable)
 	void AttackServer();

@@ -77,6 +77,8 @@ void AThirdPersonCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	OriginalWalkSpeed = WalkSpeed;
+	OriginalSprintSpeed = SprintSpeed;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -159,24 +161,36 @@ void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 
 void AThirdPersonCharacter::Sprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	if(bIsInWater)
+	    GetCharacterMovement()->MaxWalkSpeed = WaterSprintSpeed;
+	else
+		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 	SprintServer();
 }
 
 void AThirdPersonCharacter::UnSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (bIsInWater)
+		GetCharacterMovement()->MaxWalkSpeed = WaterWalkSpeed;
+	else
+	    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	UnsprintServer();
 }
 
 void AThirdPersonCharacter::SprintServer_Implementation()
 {
-	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	if (bIsInWater)
+		GetCharacterMovement()->MaxWalkSpeed = WaterSprintSpeed;
+	else
+		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 }
 
 void AThirdPersonCharacter::UnsprintServer_Implementation()
 {
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (bIsInWater)
+		GetCharacterMovement()->MaxWalkSpeed = WaterWalkSpeed;
+	else
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -189,6 +203,7 @@ void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AThirdPersonCharacter, bIsThrowing);
 	DOREPLIFETIME(AThirdPersonCharacter, CurrentCharacterType);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsRiding);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsInWater);
 }
 
 #pragma region ATTACK
@@ -402,4 +417,8 @@ void AThirdPersonCharacter::OnRep_IsRiding()
 		SetActorEnableCollision(false);
 		GetCharacterMovement()->GravityScale = 0;
 	}
+}
+
+void AThirdPersonCharacter::OnRep_IsInWater()
+{
 }
