@@ -25,6 +25,7 @@ void AHorseThirdPerson::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(AHorseThirdPerson, bIsMounted);
+    DOREPLIFETIME(AHorseThirdPerson, OldPawn);
     DOREPLIFETIME(AHorseThirdPerson, RiderController);
 }
 
@@ -61,6 +62,7 @@ void AHorseThirdPerson::DismountHorse()
         }
         RiderController->UnPossess();
         RiderController->Possess(OldPawn);
+        OldPawn = nullptr;
         bIsRiding = false;
     }
 }

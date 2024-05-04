@@ -31,13 +31,13 @@ protected:
     virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 private:
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, Replicated, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mount, Replicated, meta = (AllowPrivateAccess = "true"))
     bool bIsMounted;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, ReplicatedUsing = OnRep_RiderController, meta = (AllowPrivateAccess = "true"))
     AController* RiderController;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, Replicated, meta = (AllowPrivateAccess = "true"))
     APawn* OldPawn;
 
     UFUNCTION()

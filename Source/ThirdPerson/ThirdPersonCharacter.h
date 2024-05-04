@@ -142,7 +142,6 @@ protected:
     UFUNCTION(Server, Unreliable)
 	void UnsprintServer();
 
-	float OriginalWalkSpeed, OriginalSprintSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed = 150.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))

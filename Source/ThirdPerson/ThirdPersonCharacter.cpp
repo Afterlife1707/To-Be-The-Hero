@@ -77,8 +77,6 @@ void AThirdPersonCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	OriginalWalkSpeed = WalkSpeed;
-	OriginalSprintSpeed = SprintSpeed;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -206,6 +204,7 @@ void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AThirdPersonCharacter, CurrentCharacterType);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsRiding);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsInWater);
+	DOREPLIFETIME(AThirdPersonCharacter, bHitByFairy);
 }
 
 #pragma region ATTACK
