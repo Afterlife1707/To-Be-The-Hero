@@ -120,7 +120,7 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 {
-	if (bIsThrowing || bIsAttacking || bIsCastingSpell)
+	if (bIsThrowing || bIsAttacking || bIsCastingSpell || bHasReachedFinishLine)
 		return;
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -146,7 +146,7 @@ void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 
 void AThirdPersonCharacter::Look(const FInputActionValue& Value)
 {
-	if (bIsAttacking || bIsThrowing || bIsCastingSpell)
+	if (bIsAttacking || bIsThrowing || bIsCastingSpell || bHasReachedFinishLine)
 		return;
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();

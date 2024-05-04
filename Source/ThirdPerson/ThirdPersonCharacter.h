@@ -40,7 +40,7 @@ class AThirdPersonCharacter : public ACharacter
 	UCameraComponent* FollowCamera;
 	
 	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
 	/** Jump Input Action */
@@ -167,6 +167,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	bool bHitByFairy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	bool bHasReachedFinishLine;
 
 	UFUNCTION(Server, Reliable)
 	void AttackServer();
