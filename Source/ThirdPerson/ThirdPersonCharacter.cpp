@@ -205,6 +205,7 @@ void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AThirdPersonCharacter, bIsRiding);
 	DOREPLIFETIME(AThirdPersonCharacter, bIsInWater);
 	DOREPLIFETIME(AThirdPersonCharacter, bHitByFairy);
+	DOREPLIFETIME(AThirdPersonCharacter, bHasReachedFinishLine);
 }
 
 #pragma region ATTACK
@@ -218,7 +219,7 @@ void AThirdPersonCharacter::AttackServer_Implementation()
 
 void AThirdPersonCharacter::AttackMulti_Implementation()
 {
-	if (bIsThrowing || bIsAttacking || GetCharacterMovement()->IsFalling())
+	if (bIsThrowing || bIsAttacking || GetCharacterMovement()->IsFalling() || bHasReachedFinishLine)
 		return;
 
 	if (CurrentItem == EItemType::Throwable)
@@ -260,7 +261,7 @@ void AThirdPersonCharacter::Melee()
 
 void AThirdPersonCharacter::ThrowServer_Implementation()
 {
-	if (bIsThrowing || bIsAttacking || bIsCastingSpell || GetCharacterMovement()->IsFalling())
+	if (bIsThrowing || bIsAttacking || bIsCastingSpell || GetCharacterMovement()->IsFalling() || bHasReachedFinishLine)
 		return;
 	//UE_LOG(LogTemp, Warning, TEXT("right click"));
 
