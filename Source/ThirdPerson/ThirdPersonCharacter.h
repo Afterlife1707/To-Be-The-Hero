@@ -73,7 +73,7 @@ class AThirdPersonCharacter : public ACharacter
 	TArray<TObjectPtr<AActor>> actorsToIgnore;
 
 	float Mana = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	float MaxMana = 3;
 
 public:
@@ -87,13 +87,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TObjectPtr<AActor> Throwable;
 
-	UPROPERTY(EditAnywhere, Category=Combat)
+	UPROPERTY(EditDefaultsOnly, Category=Combat)
 	float RogueWeaponThrowMultiplier = 1000.f;
-    UPROPERTY(EditAnywhere, Category = Combat)
+    UPROPERTY(EditDefaultsOnly, Category = Combat)
 	float RogueThrowableMultiplier = 1500.f;
-    UPROPERTY(EditAnywhere, Category = Combat)
+    UPROPERTY(EditDefaultsOnly, Category = Combat)
 	float KnightWeaponThrowMultiplier = 1500.f;
-    UPROPERTY(EditAnywhere, Category = Combat)
+    UPROPERTY(EditDefaultsOnly, Category = Combat)
 	float KnightThrowableMultiplier = 2000.f;
 
 	void IncrementMana();
@@ -142,13 +142,13 @@ protected:
     UFUNCTION(Server, Unreliable)
 	void UnsprintServer();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed = 150.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed = 350.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	float WaterWalkSpeed = 80.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	float WaterSprintSpeed = 250.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, Replicated, meta = (AllowPrivateAccess = "true"))
 	bool bIsAttacking;
