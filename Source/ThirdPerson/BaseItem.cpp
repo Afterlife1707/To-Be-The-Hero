@@ -55,6 +55,7 @@ void ABaseItem::ItemOverlapped(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		if (Cast<AHorseThirdPerson>(Character)) //if character is mounted on the horse
 			return;
+		bIsEquipped = true;
 		if (bIsEquippable)
 		{
 			if (Character->GetCurrentCharacterType() == ECharacterClass::Wizard)

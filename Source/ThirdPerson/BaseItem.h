@@ -37,12 +37,15 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ItemType")
 	bool bIsEquippable = true;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ItemType")
+	bool bIsEquipped = false;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ItemType")
 	FName socketName = "weapon_socket";
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	FVector InstigatorForwardVector;
+
 
 protected:
 	UFUNCTION()
