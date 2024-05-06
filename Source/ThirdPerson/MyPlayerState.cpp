@@ -22,7 +22,7 @@ void AMyPlayerState::CopyProperties(APlayerState* NewPlayerState)
 
     if (AMyPlayerState* MyNewPlayerState = Cast<AMyPlayerState>(NewPlayerState))
     {
-        bQualifiedForNextRound = MyNewPlayerState->bQualifiedForNextRound;
+        MyNewPlayerState->bQualifiedForNextRound = bQualifiedForNextRound;
     }
 }
 
