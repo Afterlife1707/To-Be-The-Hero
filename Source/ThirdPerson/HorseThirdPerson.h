@@ -14,16 +14,13 @@ class THIRDPERSON_API AHorseThirdPerson : public AThirdPersonCharacter
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mount, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horse, meta = (AllowPrivateAccess = "true"))
     USceneComponent* UnmountPos;
 
 public:
     AHorseThirdPerson();
 
-    // Function to handle mounting the horse
     void MountHorse(AController* RiderController);
-
-    // Function to handle dismounting the horse
     void DismountHorse();
 
 protected:
@@ -34,14 +31,17 @@ protected:
     virtual void Move(const FInputActionValue& Value) override;
 
 private:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mount, Replicated, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horse, Replicated, meta = (AllowPrivateAccess = "true"))
     bool bIsMounted;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, ReplicatedUsing = OnRep_RiderController, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Horse, ReplicatedUsing = OnRep_RiderController, meta = (AllowPrivateAccess = "true"))
     AController* RiderController;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mount, Replicated, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Horse, Replicated, meta = (AllowPrivateAccess = "true"))
     APawn* OldPawn;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Horse, Replicated, meta = (AllowPrivateAccess = "true"))
+    float ForwardThrustMultiplier = 1200.f;
 
     UFUNCTION()
     void OnRep_RiderController();
