@@ -79,9 +79,22 @@ void AThirdPersonCharacter::BeginPlay()
 	}
 }
 
+void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AThirdPersonCharacter, CurrentItem);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsAttacking);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsCastingSpell);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsThrowing);
+	DOREPLIFETIME(AThirdPersonCharacter, CurrentCharacterType);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsRiding);
+	DOREPLIFETIME(AThirdPersonCharacter, bIsInWater);
+	DOREPLIFETIME(AThirdPersonCharacter, bHitByFairy);
+	DOREPLIFETIME(AThirdPersonCharacter, bHasReachedFinishLine);
+}
 //////////////////////////////////////////////////////////////////////////
 // Input
-
 
 void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -117,6 +130,7 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
+#pragma region MOVEMENT
 
 void AThirdPersonCharacter::Jump()
 {
@@ -146,8 +160,6 @@ void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 
 		// add movement
 		AddMovementInput(bHitByFairy ? -ForwardDirection : ForwardDirection, MovementVector.Y);
-		if (GetCharacterMovement()->IsFalling())
-			return;
 		AddMovementInput(bHitByFairy ? -RightDirection:RightDirection, MovementVector.X);
 	}
 }
@@ -201,20 +213,7 @@ void AThirdPersonCharacter::UnsprintServer_Implementation()
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
-void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AThirdPersonCharacter, CurrentItem);
-	DOREPLIFETIME(AThirdPersonCharacter, bIsAttacking);
-	DOREPLIFETIME(AThirdPersonCharacter, bIsCastingSpell);
-	DOREPLIFETIME(AThirdPersonCharacter, bIsThrowing);
-	DOREPLIFETIME(AThirdPersonCharacter, CurrentCharacterType);
-	DOREPLIFETIME(AThirdPersonCharacter, bIsRiding);
-	DOREPLIFETIME(AThirdPersonCharacter, bIsInWater);
-	DOREPLIFETIME(AThirdPersonCharacter, bHitByFairy);
-	DOREPLIFETIME(AThirdPersonCharacter, bHasReachedFinishLine);
-}
+#pragma endregion
 
 #pragma region ATTACK
 void AThirdPersonCharacter::AttackServer_Implementation()
@@ -354,6 +353,7 @@ void AThirdPersonCharacter::TriggerThrow()
 
 #pragma endregion
 
+#pragma region HORSE
 void AThirdPersonCharacter::IncrementMana()
 {
 	if (++Mana > MaxMana)
@@ -428,6 +428,7 @@ void AThirdPersonCharacter::OnRep_IsRiding()
 		GetCharacterMovement()->GravityScale = 0;
 	}
 }
+#pragma endregion
 
 void AThirdPersonCharacter::OnRep_IsInWater()
 {

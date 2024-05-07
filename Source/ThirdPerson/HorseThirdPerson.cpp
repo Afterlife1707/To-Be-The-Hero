@@ -29,6 +29,31 @@ void AHorseThirdPerson::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
     DOREPLIFETIME(AHorseThirdPerson, RiderController);
 }
 
+void AHorseThirdPerson::Move(const FInputActionValue& Value)
+{
+    if (GetCharacterMovement()->IsFalling())
+        return;
+    Super::Move(Value);
+}
+
+void AHorseThirdPerson::Jump()
+{
+    //horse cant jump if not fast enough
+    if (GetCharacterMovement()->Velocity.Length() < SprintSpeed-10.f)//-10 little balancing
+        return;
+    //and if it can, it will be after a delay and a forward push
+    FTimerHandle TimerHandle;
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &AHorseThirdPerson::DelayedJump, .2f, false);
+}
+
+void AHorseThirdPerson::DelayedJump()
+{
+    FVector NewVelocity = GetCharacterMovement()->Velocity + (GetActorForwardVector() * 1200);
+    GetCharacterMovement()->Velocity = NewVelocity;
+    Super::Jump();
+}
+
+
 void AHorseThirdPerson::MountHorse(AController* NewRiderController)
 {
     if (NewRiderController && !bIsMounted && HasAuthority())

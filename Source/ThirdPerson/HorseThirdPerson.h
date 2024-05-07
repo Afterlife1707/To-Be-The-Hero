@@ -29,6 +29,9 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+    virtual void Jump() override;
+    void DelayedJump();
+    virtual void Move(const FInputActionValue& Value) override;
 
 private:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mount, Replicated, meta = (AllowPrivateAccess = "true"))
