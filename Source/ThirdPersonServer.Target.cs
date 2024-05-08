@@ -10,8 +10,6 @@ public class ThirdPersonServerTarget : TargetRules
 		Type = TargetType.Server;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
-
-        bUsesSteam = true;
-        ExtraModuleNames.Add("ThirdPerson");
+		ExtraModuleNames.Add("ThirdPerson");
 	}
 }
