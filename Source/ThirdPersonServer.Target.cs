@@ -11,5 +11,10 @@ public class ThirdPersonServerTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
 		ExtraModuleNames.Add("ThirdPerson");
-	}
+
+        DisablePlugins.Add("WMFMediaPlayer");
+        DisablePlugins.Add("AsyncLoadingScreen");
+        DisablePlugins.Add("WindowsMoviePlayer");
+        DisablePlugins.Add("MediaFoundationMediaPlayer");
+    }
 }

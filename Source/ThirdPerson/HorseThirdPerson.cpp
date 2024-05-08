@@ -29,14 +29,14 @@ void AHorseThirdPerson::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
     DOREPLIFETIME(AHorseThirdPerson, RiderController);
 }
 
-void AHorseThirdPerson::Move(const FInputActionValue& Value) override
+void AHorseThirdPerson::Move(const FInputActionValue& Value) 
 {
     if (GetCharacterMovement()->IsFalling())
         return;
     Super::Move(Value);
 }
 
-void AHorseThirdPerson::Jump() override
+void AHorseThirdPerson::Jump() 
 {
     //horse cant jump if not fast enough
     if (GetCharacterMovement()->Velocity.Length() < SprintSpeed-10.f)//-10 little balancing

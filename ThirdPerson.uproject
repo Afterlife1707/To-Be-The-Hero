@@ -27,7 +27,7 @@
 		},
 		{
 			"Name": "PlayFabGSDK",
-			"Enabled": true
+			"Enabled": false
 		},
 		{
 			"Name": "PlayFab",
