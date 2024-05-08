@@ -10,6 +10,8 @@ public class ThirdPersonClientTarget : TargetRules
 		Type = TargetType.Client;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
-		ExtraModuleNames.Add("ThirdPerson");
+
+        bUsesSteam = true;
+        ExtraModuleNames.Add("ThirdPerson");
 	}
 }
