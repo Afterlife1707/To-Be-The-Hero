@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class TOBETHEHERO_API UShutDownDS : public UBlueprintFunctionLibrary
+class THIRDPERSON_API UShutDownDS : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

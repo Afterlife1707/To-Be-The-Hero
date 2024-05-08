@@ -3,15 +3,15 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class ToBeTheHeroServerTarget : TargetRules
+public class ThirdPersonEditorTarget : TargetRules
 {
-	public ToBeTheHeroServerTarget(TargetInfo Target) : base(Target)
+	public ThirdPersonEditorTarget(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Server;
+		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
 
         bUsesSteam = true;
-        ExtraModuleNames.Add("ToBeTheHero");
+        ExtraModuleNames.Add("ThirdPerson");
 	}
 }

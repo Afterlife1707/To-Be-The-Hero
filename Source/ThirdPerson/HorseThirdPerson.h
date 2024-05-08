@@ -10,7 +10,7 @@
  *
  */
 UCLASS()
-class TOBETHEHERO_API AHorseThirdPerson : public AThirdPersonCharacter
+class THIRDPERSON_API AHorseThirdPerson : public AThirdPersonCharacter
 {
     GENERATED_BODY()
 
