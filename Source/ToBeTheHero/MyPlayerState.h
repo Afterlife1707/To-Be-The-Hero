@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class THIRDPERSON_API AMyPlayerState : public APlayerState
+class TOBETHEHERO_API AMyPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 

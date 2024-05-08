@@ -18,7 +18,7 @@ enum EItemType
 };
 
 UCLASS()
-class THIRDPERSON_API ABaseItem : public AActor
+class TOBETHEHERO_API ABaseItem : public AActor
 {
 	GENERATED_BODY()
 	

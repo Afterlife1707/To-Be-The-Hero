@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class ThirdPerson : ModuleRules
+public class ToBeTheHero : ModuleRules
 {
-	public ThirdPerson(ReadOnlyTargetRules Target) : base(Target)
+	public ToBeTheHero(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
