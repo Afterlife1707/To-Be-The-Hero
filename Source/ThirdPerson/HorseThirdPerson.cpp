@@ -39,7 +39,7 @@ void AHorseThirdPerson::Move(const FInputActionValue& Value)
 void AHorseThirdPerson::Jump() 
 {
     //horse cant jump if not fast enough
-    if (GetCharacterMovement()->Velocity.Length() < SprintSpeed-10.f)//-10 little balancing
+    if (GetCharacterMovement()->Velocity.Length() < SprintSpeed-30.f)//-30 little balancing
         return;
     //and if it can, it will be after a delay and a forward push
     FTimerHandle TimerHandle;
