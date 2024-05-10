@@ -218,9 +218,6 @@ void AThirdPersonCharacter::UnsprintServer_Implementation()
 #pragma region ATTACK
 void AThirdPersonCharacter::AttackServer_Implementation()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("left click"));
-	//UE_LOG(LogTemp, Warning, TEXT("bIsAttacking is %s"), (bIsAttacking ? TEXT("true") : TEXT("false")));
-
 	AttackMulti();
 }
 
