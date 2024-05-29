@@ -8,9 +8,9 @@ public class ThirdPersonServerTarget : TargetRules
 	public ThirdPersonServerTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Server;
-		DefaultBuildSettings = BuildSettingsVersion.V4;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
-		ExtraModuleNames.Add("ThirdPerson");
+        DefaultBuildSettings = BuildSettingsVersion.V5;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
+        ExtraModuleNames.Add("ThirdPerson");
 
         DisablePlugins.Add("WMFMediaPlayer");
         DisablePlugins.Add("AsyncLoadingScreen");
