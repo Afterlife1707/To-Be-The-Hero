@@ -163,6 +163,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, ReplicatedUsing= OnRep_IsInWater, meta = (AllowPrivateAccess = "true"))
 	bool bIsInWater;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	bool bSpeedBoost;
+
 	UFUNCTION(Category = Combat)
 	void OnRep_IsInWater();
 

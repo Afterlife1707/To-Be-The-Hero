@@ -92,6 +92,7 @@ void AThirdPersonCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AThirdPersonCharacter, bIsInWater);
 	DOREPLIFETIME(AThirdPersonCharacter, bHitByFairy);
 	DOREPLIFETIME(AThirdPersonCharacter, bHasReachedFinishLine);
+	//DOREPLIFETIME(AThirdPersonCharacter, bSpeedBoost);
 }
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -153,8 +154,7 @@ void AThirdPersonCharacter::Move(const FInputActionValue& Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
+	    const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
@@ -185,6 +185,9 @@ void AThirdPersonCharacter::Sprint()
 	    GetCharacterMovement()->MaxWalkSpeed = WaterSprintSpeed;
 	else
 		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+
+	if (bSpeedBoost)
+		GetCharacterMovement()->MaxWalkSpeed += 300.f;
 	SprintServer();
 }
 
@@ -194,6 +197,8 @@ void AThirdPersonCharacter::UnSprint()
 		GetCharacterMovement()->MaxWalkSpeed = WaterWalkSpeed;
 	else
 	    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (bSpeedBoost)
+		GetCharacterMovement()->MaxWalkSpeed += 300.f;
 	UnsprintServer();
 }
 
@@ -203,6 +208,8 @@ void AThirdPersonCharacter::SprintServer_Implementation()
 		GetCharacterMovement()->MaxWalkSpeed = WaterSprintSpeed;
 	else
 		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	if (bSpeedBoost)
+		GetCharacterMovement()->MaxWalkSpeed += 300.f;
 }
 
 void AThirdPersonCharacter::UnsprintServer_Implementation()
@@ -211,6 +218,8 @@ void AThirdPersonCharacter::UnsprintServer_Implementation()
 		GetCharacterMovement()->MaxWalkSpeed = WaterWalkSpeed;
 	else
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (bSpeedBoost)
+		GetCharacterMovement()->MaxWalkSpeed += 300.f;
 }
 
 #pragma endregion
